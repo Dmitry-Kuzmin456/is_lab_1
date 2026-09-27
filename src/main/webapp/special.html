@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Операции</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+    <a class="brand" href="index.html">Драконы</a>
+    <nav>
+        <a href="index.html">Список</a>
+        <a href="create.html">Создать</a>
+        <a class="is-active" href="special.html">Операции</a>
+    </nav>
+</header>
+<main class="wrap stack">
+    <section class="card">
+        <h1>Операции</h1>
+        <p id="error" class="message"></p>
+        <div class="stack">
+            <section>
+                <h2>Самая поздняя дата создания</h2>
+                <button type="button" id="max-date">Найти</button>
+            </section>
+            <section>
+                <h2>Имя содержит подстроку</h2>
+                <form id="by-name" class="row">
+                    <label>Подстрока
+                        <input id="part" type="text" required>
+                    </label>
+                    <button type="submit">Найти</button>
+                </form>
+            </section>
+            <section>
+                <h2>Характер меньше заданного</h2>
+                <p>Порядок: Мудрый, Добрый, Хаотичный, Непостоянный.</p>
+                <form id="by-character" class="row">
+                    <label>Характер
+                        <select id="character" required></select>
+                    </label>
+                    <button type="submit">Найти</button>
+                </form>
+            </section>
+            <section>
+                <h2>Новая команда убийц</h2>
+                <form id="team-form" class="grid">
+                    <label class="span-2">Имя команды
+                        <input id="team-name" type="text" maxlength="255" required>
+                    </label>
+                    <label class="span-2">Убийцы
+                        <select id="members" multiple size="5"></select>
+                    </label>
+                    <button type="submit">Сохранить в базе</button>
+                </form>
+            </section>
+            <section>
+                <h2>Отправить команду в пещеру</h2>
+                <form id="send-form" class="row">
+                    <label>Команда
+                        <select id="team-id" required></select>
+                    </label>
+                    <label>Пещера
+                        <select id="cave-id" required></select>
+                    </label>
+                    <button type="submit">Отправить</button>
+                </form>
+                <div id="teams"></div>
+            </section>
+        </div>
+    </section>
+    <section class="card">
+        <h2>Результат</h2>
+        <div id="result"></div>
+    </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/special.js"></script>
+</body>
+</html>

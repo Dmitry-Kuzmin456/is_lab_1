@@ -1,0 +1,42 @@
+# Gradle
+.gradle/
+build/
+out/
+bin/
+
+# Java
+*.class
+hs_err_pid*
+replay_pid*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code (локальный путь к JDK)
+.vscode/
+
+# ОС
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.swp
+*~
+
+# Секреты и локальное окружение
+.env
+.env.*
+!.env.example

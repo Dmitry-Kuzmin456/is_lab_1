@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    <datasource jndi-name="java:jboss/datasources/Lab1DS" pool-name="Lab1DS" enabled="true" use-java-context="true">
+        <connection-url>jdbc:postgresql://pg:5432/studs</connection-url>
+        <driver>postgresql</driver>
+        <security>
+            <user-name>studs</user-name>
+            <password>studs</password>
+        </security>
+    </datasource>
+</datasources>

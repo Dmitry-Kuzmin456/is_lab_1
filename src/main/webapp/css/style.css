@@ -1,0 +1,273 @@
+:root {
+    --bg: #e7dccb;
+    --paper: #fbf6ee;
+    --ink: #2f2923;
+    --muted: #7d6d5d;
+    --line: #e4d5c3;
+    --accent: #a97856;
+    --soft: #f3e6d4;
+    --danger: #8f4638;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background: var(--bg);
+    font: 16px/1.45 "Avenir Next", "Segoe UI", sans-serif;
+}
+
+a {
+    color: inherit;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 28px;
+}
+
+.brand {
+    font-family: Palatino, "Iowan Old Style", Georgia, serif;
+    font-size: 28px;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+nav a,
+.button,
+button {
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--ink);
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+nav a.is-active,
+.button,
+button {
+    background: var(--accent);
+    color: #fffaf4;
+}
+
+.button.quiet,
+button.quiet {
+    background: var(--soft);
+    color: var(--ink);
+}
+
+.button.danger,
+button.danger {
+    background: transparent;
+    color: var(--danger);
+    box-shadow: inset 0 0 0 1px #e3c3bb;
+}
+
+.wrap {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto 40px;
+}
+
+.card {
+    background: var(--paper);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 12px 30px rgba(80, 55, 30, 0.05);
+}
+
+h1, h2 {
+    font-family: Palatino, "Iowan Old Style", Georgia, serif;
+    font-weight: 500;
+    margin: 0 0 14px;
+}
+
+h2 {
+    font-size: 22px;
+}
+
+.filters,
+.row,
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+}
+
+.filters {
+    margin-bottom: 16px;
+}
+
+label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+input,
+select {
+    min-width: 0;
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    box-shadow: inset 0 0 0 1px var(--line);
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid #e2c2a8;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th,
+td {
+    padding: 10px 12px;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--line);
+}
+
+th {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.pager {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.message {
+    min-height: 1.2em;
+    color: var(--danger);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+}
+
+.span-2 {
+    grid-column: 1 / -1;
+}
+
+.block {
+    margin-top: 18px;
+    padding-top: 8px;
+}
+
+.facts {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 8px 12px;
+}
+
+.facts span {
+    color: var(--muted);
+}
+
+.visual {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--soft);
+}
+
+.creature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wing {
+    height: 34px;
+    border-radius: 40px;
+    background: #d7b89a;
+}
+
+.wing.left {
+    border-radius: 40px 10px 10px 40px;
+}
+
+.wing.right {
+    border-radius: 10px 40px 40px 10px;
+}
+
+.body {
+    width: 78px;
+    height: 46px;
+    margin: 0 6px;
+    border-radius: 40px;
+    background: #b98968;
+}
+
+.head {
+    width: 26px;
+    height: 26px;
+    margin-left: -16px;
+    border-radius: 50%;
+    background: #8d6248;
+}
+
+.stack {
+    display: grid;
+    gap: 16px;
+}
+
+.mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.dialog-page .wrap {
+    width: min(760px, calc(100% - 32px));
+}
+
+@media (max-width: 720px) {
+    .grid,
+    .facts {
+        grid-template-columns: 1fr;
+    }
+
+    .top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
