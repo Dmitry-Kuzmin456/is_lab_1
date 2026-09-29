@@ -1,4 +1,0 @@
-module add --name=org.postgresql --resources=/tmp/postgresql.jar --dependencies=java.logging,java.management,java.naming,java.security.jgss,java.transaction.xa,jakarta.transaction.api
-embed-server --server-config=standalone.xml --std-out=echo
-/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
-stop-embedded-server

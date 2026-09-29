@@ -5,15 +5,9 @@ function fact(title, value) {
 }
 
 function render(dragon) {
-    const wing = Math.max(28, Math.min(Number(dragon.wingspan) * 10, 180));
     document.getElementById('content').innerHTML = `
         <div class="visual">
-            <div class="creature">
-                <span class="wing left" style="width:${wing}px"></span>
-                <span class="body"></span>
-                <span class="head"></span>
-                <span class="wing right" style="width:${wing}px"></span>
-            </div>
+            <img class="dragon" src="img/dragon.svg?v=2" alt="">
             <div>Размах ${num(dragon.wingspan)} · возраст ${num(dragon.age)} · вес ${num(dragon.weight)}</div>
             <a class="button" href="edit.html?id=${dragon.id}" target="dragon-edit">Изменить</a>
         </div>

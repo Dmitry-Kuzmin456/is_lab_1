@@ -1,6 +1,9 @@
 # Gradle
 .gradle/
 build/
+
+# Дистрибутив WildFly
+wildfly/
 out/
 bin/
 

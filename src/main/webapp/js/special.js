@@ -3,20 +3,18 @@ let teams = [];
 let refreshResult = () => {};
 
 function dragonCard(dragon) {
-    return `<article class="mini">
+    return `<article class="hit">
         <a href="view.html?id=${dragon.id}">${esc(dragon.name)}</a>
-        <span>№ ${dragon.id}</span>
-        <span>${esc(dragon.creationDate || '—')}</span>
-        <span>${esc(label(dragon.character))}</span>
-        <span>пещера ${num(dragon.caveDepth)}</span>
-        <span>${esc(dragon.killerName || 'без убийцы')}</span>
+        <p>№ ${dragon.id} · ${esc(dragon.creationDate || '—')} · ${esc(label(dragon.character))}</p>
+        <p>пещера ${num(dragon.caveDepth)} · ${esc(dragon.killerName || 'без убийцы')}</p>
     </article>`;
 }
 
-function showDragons(list) {
+function showDragons(list, title) {
+    document.getElementById('result-title').textContent = title;
     const node = document.getElementById('result');
     if (!list.length) {
-        node.innerHTML = '<p>Ничего не найдено.</p>';
+        node.innerHTML = '<p class="hint">Ничего не найдено.</p>';
         return;
     }
     node.innerHTML = list.map(dragonCard).join('');
@@ -24,12 +22,24 @@ function showDragons(list) {
 
 function showTeam(team) {
     const members = team.members && team.members.length ? team.members.map(esc).join(', ') : 'без участников';
-    document.getElementById('result').innerHTML = `<article class="mini">
+    document.getElementById('team-result').innerHTML = `<article class="hit">
         <strong>${esc(team.name)}</strong>
-        <span>№ ${team.id}</span>
-        <span>${esc(team.caveLabel || 'пещера не назначена')}</span>
-        <span>${members}</span>
+        <p>№ ${team.id} · ${esc(team.caveLabel || 'пещера не назначена')}</p>
+        <p>${members}</p>
     </article>`;
+}
+
+function renderMembers() {
+    const box = document.getElementById('members');
+    const checked = new Set([...box.querySelectorAll('input:checked')].map((input) => input.value));
+    if (!options.persons.length) {
+        box.innerHTML = '<p class="hint">Убийц пока нет. Сначала укажите убийцу у дракона.</p>';
+        return;
+    }
+    box.innerHTML = options.persons.map((person) => `<label class="check">
+        <input type="checkbox" value="${person.id}" ${checked.has(String(person.id)) ? 'checked' : ''}>
+        <span>${esc(person.label)}</span>
+    </label>`).join('');
 }
 
 function renderTeams() {
@@ -46,7 +56,7 @@ async function loadLists() {
     options = await api('api/dragons/options');
     teams = await api('api/special/teams');
     document.getElementById('character').innerHTML = enumOptions(options.characters);
-    document.getElementById('members').innerHTML = options.persons.map((person) => `<option value="${person.id}">${esc(person.label)}</option>`).join('');
+    renderMembers();
     document.getElementById('cave-id').innerHTML = options.caves.map((cave) => `<option value="${cave.id}">${esc(cave.label)}</option>`).join('');
     renderTeams();
 }
@@ -54,7 +64,7 @@ async function loadLists() {
 document.getElementById('max-date').addEventListener('click', async () => {
     refreshResult = () => document.getElementById('max-date').click();
     try {
-        showDragons([await api('api/special/max-date')]);
+        showDragons([await api('api/special/max-date')], 'Самая поздняя дата');
         showError(null);
     } catch (error) {
         document.getElementById('result').innerHTML = '';
@@ -66,7 +76,7 @@ document.getElementById('by-name').addEventListener('submit', async (event) => {
     event.preventDefault();
     const part = document.getElementById('part').value.trim();
     refreshResult = async () => {
-        showDragons(await api('api/special/by-name?part=' + encodeURIComponent(part)));
+        showDragons(await api('api/special/by-name?part=' + encodeURIComponent(part)), 'Имя содержит «' + part + '»');
     };
     try {
         await refreshResult();
@@ -80,7 +90,7 @@ document.getElementById('by-character').addEventListener('submit', async (event)
     event.preventDefault();
     const character = document.getElementById('character').value;
     refreshResult = async () => {
-        showDragons(await api('api/special/by-character?character=' + encodeURIComponent(character)));
+        showDragons(await api('api/special/by-character?character=' + encodeURIComponent(character)), 'Характер меньше: ' + label(character));
     };
     try {
         await refreshResult();
@@ -92,7 +102,7 @@ document.getElementById('by-character').addEventListener('submit', async (event)
 
 document.getElementById('team-form').addEventListener('submit', async (event) => {
     event.preventDefault();
-    const memberIds = [...document.getElementById('members').selectedOptions].map((option) => option.value);
+    const memberIds = [...document.querySelectorAll('#members input:checked')].map((input) => input.value);
     try {
         const team = await api('api/special/teams', {
             method: 'POST',
