@@ -54,6 +54,43 @@
         <h1>Команды</h1>
         <div class="stack">
             <section>
+                <h2>Новый убийца</h2>
+                <form id="killer-form" class="grid">
+                    <label>Имя
+                        <input id="killer-name" type="text" maxlength="255" required>
+                    </label>
+                    <label>Цвет глаз
+                        <select id="killer-eye" required></select>
+                    </label>
+                    <label>Цвет волос
+                        <select id="killer-hair"></select>
+                    </label>
+                    <label>Страна
+                        <select id="killer-country"></select>
+                    </label>
+                    <label>День рождения
+                        <input id="killer-birthday" type="datetime-local">
+                    </label>
+                    <label class="span-2">Место
+                        <select id="killer-location"></select>
+                    </label>
+                    <label>Место X
+                        <input id="killer-x" type="number" step="any" required>
+                    </label>
+                    <label>Место Y
+                        <input id="killer-y" type="number" step="any" required>
+                    </label>
+                    <label>Место Z
+                        <input id="killer-z" type="number" step="any" required>
+                    </label>
+                    <label>Название места
+                        <input id="killer-place" type="text" maxlength="321">
+                    </label>
+                    <button type="submit">Сохранить убийцу</button>
+                </form>
+                <div id="killer-result"></div>
+            </section>
+            <section>
                 <h2>Новая команда убийц</h2>
                 <form id="team-form" class="grid">
                     <label class="span-2">Имя команды
@@ -83,7 +120,7 @@
         </div>
     </section>
 </main>
-<script src="js/common.js?v=3"></script>
-<script src="js/special.js?v=3"></script>
+<script src="js/common.js?v=4"></script>
+<script src="js/special.js?v=4"></script>
 </body>
 </html>

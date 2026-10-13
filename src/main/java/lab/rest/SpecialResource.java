@@ -11,9 +11,12 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lab.dto.DragonResponse;
+import lab.dto.KillerRequest;
+import lab.dto.PersonOption;
 import lab.dto.SendTeamRequest;
 import lab.dto.TeamRequest;
 import lab.dto.TeamResponse;
+import lab.service.DragonService;
 import lab.service.SpecialService;
 import lab.ws.DragonSocket;
 
@@ -27,6 +30,9 @@ public class SpecialResource {
 
     @Inject
     private SpecialService specials;
+
+    @Inject
+    private DragonService dragons;
 
     @GET
     @Path("max-date")
@@ -44,6 +50,14 @@ public class SpecialResource {
     @Path("by-character")
     public List<DragonResponse> byCharacter(@QueryParam("character") String character) {
         return specials.byCharacter(character);
+    }
+
+    @POST
+    @Path("killers")
+    public Response createKiller(KillerRequest request) {
+        PersonOption body = dragons.createKiller(request);
+        DragonSocket.broadcast();
+        return Response.status(Response.Status.CREATED).entity(body).build();
     }
 
     @GET

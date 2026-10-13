@@ -10,6 +10,7 @@ import lab.dto.CoordinatesOption;
 import lab.dto.DragonRequest;
 import lab.dto.DragonResponse;
 import lab.dto.HeadOption;
+import lab.dto.KillerRequest;
 import lab.dto.LocationOption;
 import lab.dto.OptionsResponse;
 import lab.dto.PageResponse;
@@ -112,6 +113,41 @@ public class DragonService {
     }
 
     @Transactional
+    public PersonOption createKiller(KillerRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Нет данных убийцы");
+        }
+        DragonRequest mapped = new DragonRequest();
+        mapped.killerName = request.name;
+        mapped.eyeColor = request.eyeColor;
+        mapped.hairColor = request.hairColor;
+        mapped.nationality = request.nationality;
+        mapped.birthday = request.birthday;
+        mapped.locationId = request.locationId;
+        mapped.locationX = request.locationX;
+        mapped.locationY = request.locationY;
+        mapped.locationZ = request.locationZ;
+        mapped.locationName = request.locationName;
+        List<String> errors = new ArrayList<>();
+        Person person = killer(mapped, errors);
+        if (person == null) {
+            errors.add("Имя убийцы не может быть пустым");
+        } else {
+            errors.addAll(messages(person));
+            if (person.getLocation() != null) {
+                errors.addAll(messages(person.getLocation()));
+            }
+        }
+        throwIfNeeded(errors);
+        if (person.getLocation() != null && person.getLocation().getId() == null) {
+            dragons.persist(person.getLocation());
+        }
+        dragons.persist(person);
+        dragons.flush();
+        return personOption(person);
+    }
+
+    @Transactional
     public OptionsResponse options() {
         OptionsResponse response = new OptionsResponse();
         for (Coordinates coordinates : dragons.allCoordinates()) {
@@ -131,25 +167,7 @@ public class DragonService {
             response.caves.add(option);
         }
         for (Person person : dragons.allPersons()) {
-            PersonOption option = new PersonOption();
-            option.id = person.getId();
-            option.name = person.getName();
-            option.label = option.id + ": " + option.name;
-            option.eyeColor = person.getEyeColor() == null ? null : person.getEyeColor().name();
-            option.hairColor = person.getHairColor() == null ? null : person.getHairColor().name();
-            option.nationality = person.getNationality() == null ? null : person.getNationality().name();
-            if (person.getBirthday() != null) {
-                option.birthday = person.getBirthday().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            }
-            Location location = person.getLocation();
-            if (location != null) {
-                option.locationId = location.getId();
-                option.locationX = location.getX();
-                option.locationY = location.getY();
-                option.locationZ = location.getZ();
-                option.locationName = location.getName();
-            }
-            response.persons.add(option);
+            response.persons.add(personOption(person));
         }
         for (DragonHead head : dragons.allHeads()) {
             HeadOption option = new HeadOption();
@@ -173,6 +191,28 @@ public class DragonService {
         response.colors = List.of("GREEN", "BLACK", "BLUE", "YELLOW", "ORANGE");
         response.countries = List.of("RUSSIA", "USA", "GERMANY", "SPAIN", "INDIA");
         return response;
+    }
+
+    private PersonOption personOption(Person person) {
+        PersonOption option = new PersonOption();
+        option.id = person.getId();
+        option.name = person.getName();
+        option.label = option.id + ": " + option.name;
+        option.eyeColor = person.getEyeColor() == null ? null : person.getEyeColor().name();
+        option.hairColor = person.getHairColor() == null ? null : person.getHairColor().name();
+        option.nationality = person.getNationality() == null ? null : person.getNationality().name();
+        if (person.getBirthday() != null) {
+            option.birthday = person.getBirthday().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+        Location location = person.getLocation();
+        if (location != null) {
+            option.locationId = location.getId();
+            option.locationX = location.getX();
+            option.locationY = location.getY();
+            option.locationZ = location.getZ();
+            option.locationName = location.getName();
+        }
+        return option;
     }
 
     private Dragon required(int id) {

@@ -33,7 +33,7 @@ function renderMembers() {
     const box = document.getElementById('members');
     const checked = new Set([...box.querySelectorAll('input:checked')].map((input) => input.value));
     if (!options.persons.length) {
-        box.innerHTML = '<p class="hint">Убийц пока нет. Сначала укажите убийцу у дракона.</p>';
+        box.innerHTML = '<p class="hint">Убийц пока нет. Создайте убийцу выше.</p>';
         return;
     }
     box.innerHTML = options.persons.map((person) => `<label class="check">
@@ -56,6 +56,13 @@ async function loadLists() {
     options = await api('api/dragons/options');
     teams = await api('api/special/teams');
     document.getElementById('character').innerHTML = enumOptions(options.characters);
+    document.getElementById('killer-eye').innerHTML = enumOptions(options.colors);
+    document.getElementById('killer-hair').innerHTML = enumOptions(options.colors, 'Не указан');
+    document.getElementById('killer-country').innerHTML = enumOptions(options.countries, 'Не указана');
+    const location = document.getElementById('killer-location');
+    const previousLocation = location.value;
+    location.innerHTML = optionsHtml(options.locations, { value: 'new', text: 'Новое' });
+    location.value = previousLocation || 'new';
     renderMembers();
     document.getElementById('cave-id').innerHTML = options.caves.map((cave) => `<option value="${cave.id}">${esc(cave.label)}</option>`).join('');
     renderTeams();
@@ -95,6 +102,42 @@ document.getElementById('by-character').addEventListener('submit', async (event)
     try {
         await refreshResult();
         showError(null);
+    } catch (error) {
+        showError(error);
+    }
+});
+
+document.getElementById('killer-location').addEventListener('change', () => {
+    const item = options.locations.find((it) => String(it.id) === document.getElementById('killer-location').value);
+    document.getElementById('killer-x').value = item ? item.x : '';
+    document.getElementById('killer-y').value = item ? item.y : '';
+    document.getElementById('killer-z').value = item ? item.z : '';
+    document.getElementById('killer-place').value = item && item.name ? item.name : '';
+});
+
+document.getElementById('killer-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const locationId = document.getElementById('killer-location').value;
+    try {
+        const person = await api('api/special/killers', {
+            method: 'POST',
+            body: JSON.stringify({
+                name: document.getElementById('killer-name').value.trim(),
+                eyeColor: document.getElementById('killer-eye').value,
+                hairColor: document.getElementById('killer-hair').value,
+                nationality: document.getElementById('killer-country').value,
+                birthday: document.getElementById('killer-birthday').value,
+                locationId: locationId === 'new' ? null : locationId,
+                locationX: document.getElementById('killer-x').value.trim(),
+                locationY: document.getElementById('killer-y').value.trim(),
+                locationZ: document.getElementById('killer-z').value.trim(),
+                locationName: document.getElementById('killer-place').value.trim()
+            })
+        });
+        document.getElementById('killer-result').innerHTML = `<article class="hit"><strong>${esc(person.label)}</strong><p>Убийца сохранён и доступен в команде.</p></article>`;
+        showError(null);
+        document.getElementById('killer-form').reset();
+        await loadLists();
     } catch (error) {
         showError(error);
     }

@@ -1,0 +1,431 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{PT Sans}
+\setmonofont{PT Mono}
+
+\usepackage{polyglossia}
+\setmainlanguage{russian}
+\setotherlanguage{english}
+
+\usepackage{geometry}
+\geometry{left=30mm,right=15mm,top=20mm,bottom=20mm}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=black,
+    pdftitle={Информационные системы. Лабораторная работа 1},
+    pdfauthor={Кузьмин Дмитрий Анатольевич}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.25cm}
+\setlength{\emergencystretch}{3em}
+
+\captionsetup{font=small,skip=6pt,labelsep=endash}
+
+\tikzset{
+    uml/.style={
+        draw,
+        inner sep=3pt,
+        font=\scriptsize\linespread{1.05}\selectfont,
+        fill=white,
+        align=center
+    },
+    dep/.style={-{Stealth[length=2.2mm]}, semithick},
+    assoc/.style={semithick},
+    use/.style={-{Stealth[length=2.2mm,open]}, dashed, semithick}
+}
+
+\newcommand{\cls}[3]{%
+    \begin{tabular}{@{\hspace{3pt}}l@{\hspace{3pt}}}
+        \multicolumn{1}{c}{\textbf{#1}}\\
+        \hline
+        #2\\
+        \hline
+        #3
+    \end{tabular}%
+}
+
+\newcommand{\pkg}[2]{%
+    \begin{tabular}{@{\hspace{3pt}}l@{\hspace{3pt}}}
+        \multicolumn{1}{c}{\textbf{#1}}\\
+        \hline
+        #2
+    \end{tabular}%
+}
+
+\newcommand{\enm}[2]{%
+    \begin{tabular}{@{\hspace{3pt}}l@{\hspace{3pt}}}
+        \multicolumn{1}{c}{\textbf{<<enumeration>>}}\\
+        \multicolumn{1}{c}{\textbf{#1}}\\
+        \hline
+        #2
+    \end{tabular}%
+}
+
+\newcommand{\clsa}[2]{%
+    \begin{tabular}{@{\hspace{3pt}}l@{\hspace{3pt}}}
+        \multicolumn{1}{c}{\textbf{#1}}\\
+        \hline
+        #2
+    \end{tabular}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+
+\begin{center}
+    \LARGE Национальный исследовательский университет ИТМО\\[8mm]
+
+    Факультет Программной Инженерии и Компьютерной техники\\[37mm]
+
+    \huge \textbf{Информационные системы}\\[2mm]
+    \textbf{Лабораторная работа 1} \\[2mm]
+
+
+
+\end{center}
+
+\vfill
+
+
+
+
+\begin{flushright}
+
+    \large Выполнил:
+
+    Кузьмин Дмитрий Анатольевич\\[3mm]
+
+    Группа:
+
+    P3309\\[3mm]
+
+    Преподаватель:
+
+    Николаев Владимир Вячеславович
+\end{flushright}
+
+
+\vfill
+
+\begin{center}
+    Санкт-Петербург 2026
+\end{center}
+
+\end{titlepage}
+
+\section{UML-диаграммы классов и пакетов}
+
+Предметная область работы~--- учёт драконов. Серверная часть написана на Java~17 с использованием Jakarta~EE~10 (JAX-RS, CDI, Bean Validation, JPA/Hibernate) и поставляется архивом \texttt{lab1.war}. Данные хранятся в PostgreSQL. Клиент~--- статические страницы, которые вызывают REST API по пути \texttt{/api} и получают сигнал об изменениях через WebSocket \texttt{/ws/dragons}.
+
+\subsection{Диаграмма пакетов}
+
+Классы разложены по пакетам в соответствии со слоями. Пакет \texttt{lab.rest} принимает HTTP-запросы. Пакет \texttt{lab.service} содержит сценарии и проверки. Пакет \texttt{lab.repository} обращается к базе. Пакет \texttt{lab.entity} описывает сохраняемые объекты. Пакет \texttt{lab.dto} задаёт тела запросов и ответов и не зависит от сущностей. Пакет \texttt{lab.mapper} собирает \texttt{DragonResponse} из сущности. Пакет \texttt{lab.ws} рассылает клиентам уведомление после изменений.
+
+Стрелка на рисунке~\ref{fig:packages} означает зависимость: пакет на стороне начала стрелки импортирует классы пакета, на который она указывает.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=8mm]
+    \node[uml] (rest) {\pkg{lab.rest}{
+        RestApplication\\
+        JsonConfig\\
+        DragonResource\\
+        SpecialResource\\
+        IllegalArgumentMapper\\
+        MissingExceptionMapper
+    }};
+    \node[uml, below left=14mm and -2mm of rest] (service) {\pkg{lab.service}{
+        DragonService\\
+        SpecialService\\
+        MissingException
+    }};
+    \node[uml, below=of service] (repo) {\pkg{lab.repository}{
+        DragonRepository\\
+        DragonPage\\
+        SpecialRepository\\
+        DbSetup\\
+        DbSetupStarter
+    }};
+    \node[uml, below=of repo] (entity) {\pkg{lab.entity}{
+        Dragon, Coordinates, DragonCave\\
+        DragonHead, Person, Location\\
+        KillerTeam\\
+        Color, Country, DragonCharacter
+    }};
+    \node[uml, right=16mm of service] (dto) {\pkg{lab.dto}{
+        DragonRequest, DragonResponse\\
+        PageResponse, OptionsResponse\\
+        ErrorResponse\\
+        TeamRequest, TeamResponse\\
+        SendTeamRequest\\
+        CoordinatesOption, CaveOption\\
+        HeadOption, PersonOption\\
+        LocationOption
+    }};
+    \node[uml, right=16mm of repo] (mapper) {\pkg{lab.mapper}{
+        DragonMapper
+    }};
+    \node[uml, right=16mm of rest] (ws) {\pkg{lab.ws}{
+        DragonSocket
+    }};
+
+    \draw[dep] (rest) -- (service);
+    \draw[dep] (rest.east) -- (ws.west);
+    \draw[dep] (rest.south east) -- (dto.north west);
+    \draw[dep] (service) -- (repo);
+    \draw[dep] (service.east) -- (dto.west);
+    \draw[dep] (service.south east) -- (mapper.north west);
+    \draw[dep] (repo) -- (entity);
+    \draw[dep] (mapper.south) -- (entity.east);
+    \draw[dep] (mapper.north) -- (dto.south);
+\end{tikzpicture}
+\caption{Диаграмма пакетов серверной части}
+\label{fig:packages}
+\end{figure}
+
+\subsection{Диаграмма классов предметной области}
+
+На рисунке~\ref{fig:domain} показаны сущности JPA и перечисления. Сплошная линия~--- ассоциация, подписи задают кратность. Пунктир~--- использование перечисления. Общие объекты (\texttt{Coordinates}, \texttt{DragonCave}, \texttt{DragonHead}, \texttt{Person}, \texttt{Location}) могут быть связаны с несколькими драконами или людьми, поэтому связь не является композицией.
+
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[mul/.style={font=\tiny, fill=white, inner sep=1.2pt}]
+    \node[uml] (coord) at (-5.6,0) {\clsa{Coordinates}{
+        id: Integer\\
+        x: float\\
+        y: Integer
+    }};
+    \node[uml] (cave) at (0,0) {\clsa{DragonCave}{
+        id: Integer\\
+        depth: double\\
+        numberOfTreasures: Long
+    }};
+    \node[uml] (head) at (8.6,0) {\clsa{DragonHead}{
+        id: Integer\\
+        size: long
+    }};
+
+    \node[uml] (character) at (-5.6,-4.8) {\enm{DragonCharacter}{
+        WISE\\
+        GOOD\\
+        CHAOTIC\\
+        FICKLE
+    }};
+    \node[uml] (dragon) at (0,-4.8) {\cls{Dragon}{
+        id: Integer\\
+        name: String\\
+        creationDate: LocalDate\\
+        age: long\\
+        wingspan: float\\
+        weight: Float\\
+        character: DragonCharacter
+    }{fillCreationDate()}};
+    \node[uml] (team) at (5.4,-4.8) {\clsa{KillerTeam}{
+        id: Integer\\
+        name: String\\
+        cave: DragonCave\\
+        members: Set<Person>
+    }};
+
+    \node[uml] (location) at (-5.6,-10.2) {\clsa{Location}{
+        id: Integer\\
+        x: double\\
+        y: double\\
+        z: float\\
+        name: String
+    }};
+    \node[uml] (person) at (0,-10.2) {\clsa{Person}{
+        id: Integer\\
+        name: String\\
+        eyeColor: Color\\
+        hairColor: Color\\
+        birthday: LocalDateTime\\
+        nationality: Country\\
+        location: Location
+    }};
+    \node[uml] (color) at (5.6,-9.2) {\enm{Color}{
+        GREEN\\
+        BLACK\\
+        BLUE\\
+        YELLOW\\
+        ORANGE
+    }};
+    \node[uml] (country) at (5.6,-12.6) {\enm{Country}{
+        RUSSIA\\
+        USA\\
+        GERMANY\\
+        SPAIN\\
+        INDIA
+    }};
+
+    \draw[assoc] (dragon.north) -- (cave.south)
+        node[mul, pos=0.15] {*} node[mul, pos=0.85] {1};
+    \draw[assoc] (dragon.north west) -- (coord.south)
+        node[mul, pos=0.18] {*} node[mul, pos=0.82] {1};
+    \draw[assoc] (dragon.north east) -- (head.south)
+        node[mul, pos=0.18] {*} node[mul, pos=0.82] {0..1};
+    \draw[use] (dragon.west) -- (character.east);
+
+    \draw[assoc] (dragon.south) -- (person.north)
+        node[mul, pos=0.15] {*} node[mul, pos=0.85] {0..1};
+    \draw[assoc] (person.west) -- (location.east)
+        node[mul, pos=0.15] {*} node[mul, pos=0.85] {1};
+    \draw[use] (person.east) -- (color.west);
+    \draw[use] (person.south east) -- (country.west);
+
+    \draw[assoc] (team.north west) -- (cave.east)
+        node[mul, pos=0.22] {*} node[mul, pos=0.78] {0..1};
+    \draw[assoc] (team.south west) -- (person.north east)
+        node[mul, pos=0.2] {*} node[mul, pos=0.8] {*};
+\end{tikzpicture}%
+}
+\caption{Диаграмма классов предметной области}
+\label{fig:domain}
+\end{figure}
+
+\texttt{Dragon} обязательно ссылается на координаты и пещеру. Голова и убийца могут отсутствовать. Дата создания проставляется перед первой записью, если клиент её не передал. \texttt{Person} обязательно имеет местоположение; цвет глаз обязателен, цвет волос и гражданство~--- нет. \texttt{KillerTeam} объединяет убийц связью <<многие ко многим>> и может быть направлена в пещеру.
+
+\subsection{Диаграмма классов приложения}
+
+На рисунке~\ref{fig:app} показаны классы, через которые проходят запросы. Ресурсы делегируют работу сервисам и после создания, изменения, удаления дракона, а также после операций с командой вызывают \texttt{DragonSocket.broadcast()}. Сервисы открывают транзакцию, проверяют данные и обращаются к репозиториям. \texttt{DragonMapper} переводит сущность в ответ API. Если объект не найден, выбрасывается \texttt{MissingException}; обработчики в \texttt{lab.rest} превращают её и ошибки проверки в JSON.
+
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+    \node[uml] (mapper) at (6.4,4.6) {\clsa{DragonMapper}{
+        $+$ toResponse(dragon): DragonResponse
+    }};
+    \node[uml] (socket) at (0,-10.6) {\cls{DragonSocket}{
+        sessions: Set<Session>
+    }{
+        $+$ open(session)\\
+        $+$ close(session)\\
+        $+$ broadcast()
+    }};
+    \node[uml] (dres) at (0,0) {\cls{DragonResource}{
+        $-$ dragons: DragonService
+    }{
+        $+$ list(...): PageResponse\\
+        $+$ options(): OptionsResponse\\
+        $+$ get(id): DragonResponse\\
+        $+$ create(request): Response\\
+        $+$ update(id, request): DragonResponse\\
+        $+$ delete(id): Response
+    }};
+    \node[uml] (dsvc) at (6.4,0) {\cls{DragonService}{
+        $-$ dragons: DragonRepository\\
+        $-$ validator: Validator
+    }{
+        $+$ page(...): PageResponse\\
+        $+$ get(id): DragonResponse\\
+        $+$ create(request): DragonResponse\\
+        $+$ update(id, request): DragonResponse\\
+        $+$ delete(id)\\
+        $+$ options(): OptionsResponse
+    }};
+    \node[uml] (drepo) at (13.2,0.3) {\cls{DragonRepository}{
+        em: EntityManager
+    }{
+        $+$ search(...): DragonPage\\
+        $+$ find(id): Dragon\\
+        $+$ persist(entity)\\
+        $+$ deleteDragon(dragon)\\
+        $+$ allCoordinates(): List\\
+        $+$ allCaves(): List\\
+        $+$ allPersons(): List\\
+        $+$ allHeads(): List\\
+        $+$ allLocations(): List
+    }};
+    \node[uml] (sres) at (0,-5.4) {\cls{SpecialResource}{
+        $-$ specials: SpecialService
+    }{
+        $+$ maxDate(): DragonResponse\\
+        $+$ byName(part): List\\
+        $+$ byCharacter(character): List\\
+        $+$ teams(): List\\
+        $+$ createTeam(request): Response\\
+        $+$ send(request): TeamResponse
+    }};
+    \node[uml] (ssvc) at (6.4,-5.4) {\cls{SpecialService}{
+        $-$ specials: SpecialRepository\\
+        $-$ dragons: DragonRepository
+    }{
+        $+$ maxCreationDate(): DragonResponse\\
+        $+$ byName(part): List\\
+        $+$ byCharacter(character): List\\
+        $+$ teams(): List\\
+        $+$ createTeam(request): TeamResponse\\
+        $+$ send(request): TeamResponse
+    }};
+    \node[uml] (srepo) at (13.2,-5.6) {\cls{SpecialRepository}{
+        em: EntityManager
+    }{
+        $+$ dragonWithMaxCreationDate()\\
+        $+$ dragonsByName(part): List\\
+        $+$ dragonsByCharacter(c): List\\
+        $+$ createTeam(name, ids): int\\
+        $+$ sendTeam(teamId, caveId): int\\
+        $+$ teams(): List
+    }};
+    \node[uml] (missing) at (13.2,-10.4) {\clsa{MissingException}{
+        message: String
+    }};
+
+    \draw[dep] (dres) -- (dsvc);
+    \draw[dep] (dsvc) -- (drepo);
+    \draw[dep] (dsvc.north) -- (mapper.south);
+    \draw[dep] (sres) -- (ssvc);
+    \draw[dep] (ssvc) -- (srepo);
+    \draw[dep] (ssvc.north east) -- (drepo.south);
+    \draw[dep] (ssvc.east) -- ++(0.55,0) |- (mapper.east);
+    \draw[dep] (sres.south) -- (socket.north);
+    \draw[dep] (dres.west) -- ++(-0.55,0) |- (socket.west);
+    \draw[use] (ssvc.south east) -- (missing.north west);
+    \draw[use] (dsvc.east) -- ++(0.7,0) |- (missing.north);
+\end{tikzpicture}%
+}
+\caption{Диаграмма классов прикладного слоя}
+\label{fig:app}
+\end{figure}
+
+Обычный сценарий дракона: страница списка с номером страницы, размером, сортировкой и фильтром по полю; чтение одной записи; создание; изменение; удаление. Справочник \texttt{options} отдаёт уже сохранённые координаты, пещеры, головы, людей и места, чтобы их можно было выбрать повторно. Специальные операции: дракон с наибольшей датой создания, поиск по части имени, поиск по характеру, список команд, создание команды из выбранных убийц и отправка команды в пещеру.
+
+\section{Исходный код}
+
+Исходный код системы расположен в репозитории на ветке \texttt{for\_gelios}:
+
+\begin{center}
+\url{https://github.com/Dmitry-Kuzmin456/is_lab_1/tree/for_gelios}
+\end{center}
+
+\section{Выводы}
+
+В работе построена информационная система учёта драконов. Модель данных покрывает дракона и связанные с ним координаты, пещеру, голову и убийцу, а также команду убийц, которую можно собрать и направить в пещеру. Ограничения предметной области заданы и в сущностях, и при разборе запроса, поэтому в базу не попадают пустое имя, неположительные возраст, вес, размах крыльев и число сокровищ, неизвестные значения перечислений.
+
+Разделение на пакеты отделяет контракт API от хранения. Ресурсы не собирают SQL и не заполняют сущности, репозитории не знают формат JSON, а объекты \texttt{dto} не тянут за собой таблицы. За счёт этого постраничный список, фильтр и специальные выборки добавляются в своём слое, не переписывая остальные. Общие координаты, пещеры, головы и люди не копируются при каждом драконе: запись ссылается на уже существующий объект или создаёт новый, а при удалении неиспользуемый объект убирается.
+
+Изменяющие операции сообщают открытым страницам о необходимости обновить данные. Так список и экран специальных операций остаются согласованными между несколькими открытыми клиентами без периодического опроса сервера.
+
+\end{document}
